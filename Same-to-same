@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST Calculator</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            margin-bottom: 8px;
+            color: #0f766e;
+        }
+
+        .header p {
+            color: #64748b;
+            margin: 0;
+        }
+
+        .calculator-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #334155;
+            font-size: 22px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+            color: #475569;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #0f766e;
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .calculate-btn {
+            background: #0f766e;
+            color: white;
+        }
+
+        .calculate-btn:hover {
+            background: #115e59;
+        }
+
+        .reset-btn {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .reset-btn:hover {
+            background: #cbd5e1;
+        }
+
+        .results {
+            margin-top: 22px;
+            padding: 18px;
+            background: #f0fdfa;
+            border-radius: 10px;
+            border-left: 4px solid #0f766e;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #ccfbf1;
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+        }
+
+        .result-row strong {
+            color: #0f766e;
+        }
+
+        .error {
+            color: #dc2626;
+            margin-top: 10px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        @media (max-width: 700px) {
+            .calculator-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                margin: 20px auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>GST Calculator</h1>
+        <p>Calculate GST instantly and accurately</p>
+    </div>
+
+    <div class="calculator-wrapper">
+
+        <!-- Add GST -->
+        <div class="card">
+            <h2>Add GST</h2>
+
+            <div class="form-group">
+                <label for="originalPrice">Original Price</label>
+                <input
+                    type="number"
+                    id="originalPrice"
+                    placeholder="Enter original price"
+                    min="0"
+                    step="0.01"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="gstRate">GST Percentage (%)</label>
+                <input
+                    type="number"
+                    id="gstRate"
+                    placeholder="Example: 18"
+                    min="0"
+                    step="0.01"
+                >
+            </div>
+
+            <div class="button-group">
+                <button class="calculate-btn" onclick="addGST()">
+                    Calculate GST
+                </button>
+
+                <button class="reset-btn" onclick="resetAddGST()">
+                    Reset
+                </button>
+            </div>
+
+            <div id="addError" class="error">
+                Please enter valid values.
+            </div>
+
+            <div class="results">
+                <div class="result-row">
+                    <span>Original Price</span>
+                    <strong id="displayOriginal">₹0.00</strong>
+                </div>
+
+                <div class="result-row">
+                    <span>GST Amount</span>
+                    <strong id="gstAmount">₹0.00</strong>
+                </div>
+
+                <div class="result-row">
+                    <span>Total Price</span>
+                    <strong id="totalPrice">₹0.00</strong>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Remove GST -->
+        <div class="card">
+            <h2>Remove GST</h2>
+
+            <div class="form-group">
+                <label for="inclusivePrice">GST-Inclusive Price</label>
+                <input
+                    type="number"
+                    id="inclusivePrice"
+                    placeholder="Enter total price"
+                    min="0"
+                    step="0.01"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="removeGstRate">GST Percentage (%)</label>
+                <input
+                    type="number"
+                    id="removeGstRate"
+                    placeholder="Example: 18"
+                    min="0"
+                    step="0.01"
+                >
+            </div>
+
+            <div class="button-group">
+                <button class="calculate-btn" onclick="removeGST()">
+                    Remove GST
+                </button>
+
+                <button class="reset-btn" onclick="resetRemoveGST()">
+                    Reset
+                </button>
+            </div>
+
+            <div id="removeError" class="error">
+                Please enter valid values.
+            </div>
+
+            <div class="results">
+                <div class="result-row">
+                    <span>Total Price</span>
+                    <strong id="displayInclusive">₹0.00</strong>
+                </div>
+
+                <div class="result-row">
+                    <span>GST Amount</span>
+                    <strong id="removedGST">₹0.00</strong>
+                </div>
+
+                <div class="result-row">
+                    <span>Original Price</span>
+                    <strong id="priceWithoutGST">₹0.00</strong>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        GST Calculator &copy; 2026
+    </div>
+
+</div>
+
+
+<script>
+    // Format number as Indian Rupees
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat("en-IN", {
+            style: "currency",
+            currency: "INR",
+            minimumFractionDigits: 2
+        }).format(amount);
+    }
+
+
+    // Add GST
+    function addGST() {
+        const originalPrice =
+            parseFloat(document.getElementById("originalPrice").value);
+
+        const gstRate =
+            parseFloat(document.getElementById("gstRate").value);
+
+        const error = document.getElementById("addError");
+
+        // Validation
+        if (
+            isNaN(originalPrice) ||
+            isNaN(gstRate) ||
+            originalPrice < 0 ||
+            gstRate < 0
+        ) {
+            error.style.display = "block";
+            return;
+        }
+
+        error.style.display = "none";
+
+        // GST calculation
+        const gstAmount = originalPrice * (gstRate / 100);
+        const totalPrice = originalPrice + gstAmount;
+
+        // Display results
+        document.getElementById("displayOriginal").textContent =
+            formatCurrency(originalPrice);
+
+        document.getElementById("gstAmount").textContent =
+            formatCurrency(gstAmount);
+
+        document.getElementById("totalPrice").textContent =
+            formatCurrency(totalPrice);
+    }
+
+
+    // Remove GST
+    function removeGST() {
+        const inclusivePrice =
+            parseFloat(document.getElementById("inclusivePrice").value);
+
+        const gstRate =
+            parseFloat(document.getElementById("removeGstRate").value);
+
+        const error = document.getElementById("removeError");
+
+        // Validation
+        if (
+            isNaN(inclusivePrice) ||
+            isNaN(gstRate) ||
+            inclusivePrice < 0 ||
+            gstRate < 0
+        ) {
+            error.style.display = "block";
+            return;
+        }
+
+        // GST rate cannot be -100 or below
+        if (gstRate <= -100) {
+            error.style.display = "block";
+            return;
+        }
+
+        error.style.display = "none";
+
+        // Remove GST from GST-inclusive price
+        const originalPrice =
+            inclusivePrice / (1 + gstRate / 100);
+
+        const gstAmount =
+            inclusivePrice - originalPrice;
+
+        // Display results
+        document.getElementById("displayInclusive").textContent =
+            formatCurrency(inclusivePrice);
+
+        document.getElementById("removedGST").textContent =
+            formatCurrency(gstAmount);
+
+        document.getElementById("priceWithoutGST").textContent =
+            formatCurrency(originalPrice);
+    }
+
+
+    // Reset Add GST calculator
+    function resetAddGST() {
+        document.getElementById("originalPrice").value = "";
+        document.getElementById("gstRate").value = "";
+
+        document.getElementById("displayOriginal").textContent =
+            "₹0.00";
+
+        document.getElementById("gstAmount").textContent =
+            "₹0.00";
+
+        document.getElementById("totalPrice").textContent =
+            "₹0.00";
+
+        document.getElementById("addError").style.display = "none";
+    }
+
+
+    // Reset Remove GST calculator
+    function resetRemoveGST() {
+        document.getElementById("inclusivePrice").value = "";
+        document.getElementById("removeGstRate").value = "";
+
+        document.getElementById("displayInclusive").textContent =
+            "₹0.00";
+
+        document.getElementById("removedGST").textContent =
+            "₹0.00";
+
+        document.getElementById("priceWithoutGST").textContent =
+            "₹0.00";
+
+        document.getElementById("removeError").style.display = "none";
+    }
+</script>
+
+</body>
+</html>
